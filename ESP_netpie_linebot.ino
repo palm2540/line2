@@ -18,21 +18,28 @@ String uid = "";
 int timer = 0;
 MicroGear microgear(client);
 
-void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) { // 
-    Serial.print("Incoming message -->");
-    msg[msglen] = '\0';
-Serial.println((char *)msg);
-    if(*(char *)msg == '1'){
-        digitalWrite(LED_BUILTIN, LOW);   // LED on
-        //microgear.chat(TargetWeb,"1");
-        //send_data("ESP_LED_ON");
-        send_json("ESP LED ON");
-    }else{
-        digitalWrite(LED_BUILTIN, HIGH);  // LED off
-      //microgear.chat(TargetWeb,"0");
-      //send_data("ESP_LED_OFF");
-      send_json("ESP LED OFF");
-    }
+void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) { //
+  Serial.print("Incoming message -->");
+  msg[msglen] = '\0';
+
+  char strState[msglen];
+  for (int i = 0; i < msglen; i++)
+  {
+    strState[i] = (char)msg[i];
+    Serial.print((char)msg[i]);
+  }
+  Serial.println();
+
+  String stateStr = String(strState).substring(0, msglen);
+  if ( stateStr ==  "ON") {
+    digitalWrite(LED_BUILTIN, LOW);   // LED on
+     microgear.chat(TargetWeb,"1");
+     send_json("ESP LED ON");
+  } else if ( stateStr ==  "OFF" ) {
+    digitalWrite(LED_BUILTIN, HIGH);  // LED off
+    microgear.chat(TargetWeb,"0");
+    send_json("OFF");
+  }
 }
 
 void onConnected(char *attribute, uint8_t* msg, unsigned int msglen) {
